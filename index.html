@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分账工具</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* 基础样式 */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --danger-color: #ff7b7b;
+            --bg-gradient-start: #e6e9f0;
+            --bg-gradient-end: #eef1f5;
+            --card-bg: #ffffff;
+            --text-color: #343a40;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-image: linear-gradient(120deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            align-self: flex-start; /* 防止在flex容器中被拉伸 */
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 35px;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* 标题的闪亮特效 */
+        h1::after {
+            content: '✨';
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            font-size: 0.7em;
+            animation: sparkle 2s infinite ease-in-out;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+
+        /* 输入框样式 */
+        input[type="text"], input[type="number"] {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        /* 总金额区域 */
+        .total-section {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .total-section label {
+            font-size: 1.2em;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .total-section input {
+            text-align: center;
+            max-width: 220px;
+            font-size: 1.2em;
+        }
+        
+        /* 成员网格 */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        /* 成员卡片 */
+        .member-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+        
+        .member-card .member-result {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            background-color: #e7f3ff;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        
+        /* 按钮通用样式 */
+        .nice-button {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+        .nice-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px var(--shadow-color);
+        }
+        .nice-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .add-btn { background-color: var(--primary-color); }
+        .reset-btn { background-color: var(--secondary-color); }
+
+        /* 删除按钮 */
+        .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+            line-height: 28px; /* 垂直居中 */
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            font-weight: 700;
+        }
+        .remove-btn:hover {
+            background-color: #e54e4e;
+            transform: scale(1.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>分账工具</h1>
+
+        <div class="total-section">
+            <label for="total-amount">💰 总金额 💰</label>
+            <input type="number" id="total-amount" placeholder="输入总费用" oninput="calculate()">
+        </div>
+
+        <div class="members-grid" id="members-container">
+            <!-- JavaScript会在这里动态生成成员卡片 -->
+        </div>
+
+        <div class="controls">
+            <button class="nice-button add-btn" onclick="addMember()">+ 增加成员</button>
+            <button class="nice-button reset-btn" onclick="resetAll()">🔄 重置</button>
+        </div>
+    </div>
+
+    <script>
+        const membersContainer = document.getElementById('members-container');
+        let memberCounter = 0;
+
+        function createMemberCard(isRemovable = false) {
+            memberCounter++;
+            const memberId = memberCounter;
+            
+            const card = document.createElement('div');
+            card.className = 'member-card';
+            card.id = `member-card-${memberId}`;
+            
+            let removeButtonHTML = isRemovable ? `<button class="remove-btn" onclick="removeMember(${memberId})">-</button>` : '';
+
+            card.innerHTML = `
+                ${removeButtonHTML}
+                <input type="text" class="member-name" placeholder="成员 ${memberId} 名称">
+                <input type="number" class="member-time" placeholder="参与小时数" oninput="calculate()">
+                <div class="member-result">¥ 0.00</div>
+            `;
+            
+            membersContainer.appendChild(card);
+        }
+
+        function addMember() {
+            createMemberCard(true);
+        }
+
+        function removeMember(memberId) {
+            const cardToRemove = document.getElementById(`member-card-${memberId}`);
+            if (cardToRemove) {
+                cardToRemove.remove();
+                calculate();
+            }
+        }
+
+        function calculate() {
+            const totalAmount = parseFloat(document.getElementById('total-amount').value) || 0;
+            
+            const memberCards = document.querySelectorAll('.member-card');
+            let totalHours = 0;
+            const hoursPerMember = [];
+
+            memberCards.forEach(card => {
+                const timeInput = card.querySelector('.member-time');
+                const hours = parseFloat(timeInput.value) || 0;
+                hoursPerMember.push(hours);
+                totalHours += hours;
+            });
+
+            const costPerHour = (totalAmount > 0 && totalHours > 0) ? totalAmount / totalHours : 0;
+
+            memberCards.forEach((card, index) => {
+                const memberCost = hoursPerMember[index] * costPerHour;
+                const resultElement = card.querySelector('.member-result');
+                resultElement.textContent = `¥ ${memberCost.toFixed(2)}`;
+            });
+        }
+        
+        function resetAll() {
+            document.getElementById('total-amount').value = '';
+            membersContainer.innerHTML = '';
+            memberCounter = 0;
+            initialize();
+            calculate();
+        }
+
+        // 初始化函数
+        function initialize() {
+            // 初始成员减少到2个
+            for (let i = 0; i < 2; i++) {
+                createMemberCard(false); // 初始2个成员不可移除
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+
+</body>
+</html>
