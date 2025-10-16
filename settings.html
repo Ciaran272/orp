@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置 - 智能卡片截图助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #2d2d2d;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #db7093 0%, #d06080 100%);
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 20px;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        header p {
+            opacity: 0.95;
+            font-size: 12px;
+        }
+
+        .settings-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .settings-section {
+            padding: 18px;
+            background: #2d2d2d;
+            border-right: 1px solid #3d3d3d;
+            border-bottom: 1px solid #3d3d3d;
+        }
+
+        .settings-section:nth-child(2n) {
+            border-right: none;
+        }
+
+        .settings-section:last-child,
+        .settings-section:nth-last-child(2) {
+            border-bottom: none;
+        }
+
+        .settings-section.full-width {
+            grid-column: 1 / -1;
+            border-right: none;
+        }
+
+        .settings-section h2 {
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-item label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .setting-item input[type="text"],
+        .setting-item input[type="number"],
+        .setting-item select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #4d4d4d;
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: 'Microsoft YaHei', sans-serif;
+            transition: all 0.3s;
+            background: #3d3d3d;
+            color: #ffffff;
+        }
+
+        .setting-item input:focus,
+        .setting-item select:focus {
+            outline: none;
+            border-color: #db7093;
+            box-shadow: 0 0 0 3px rgba(219, 112, 147, 0.2);
+            background: #454545;
+        }
+
+        .setting-item small {
+            display: block;
+            margin-top: 4px;
+            color: #999;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .setting-item .hint {
+            background: linear-gradient(135deg, #3d3d3d 0%, #4d4d4d 100%);
+            border-left: 3px solid #db7093;
+            padding: 10px 12px;
+            margin-top: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #c0c0c0;
+            line-height: 1.5;
+        }
+
+        .setting-item .hint code {
+            background: #2d2d2d;
+            color: #ffc0cb;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 0;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3d3d3d 0%, #2d2d2d 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(61, 61, 61, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(61, 61, 61, 0.4);
+        }
+
+        .btn-secondary {
+            background: #3d3d3d;
+            color: #ffffff;
+            border: 2px solid #db7093;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #db7093 0%, #d06080 100%);
+            border-color: #db7093;
+            transform: translateY(-1px);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #db7093 0%, #d06080 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin: 12px 18px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            animation: slideIn 0.3s;
+            box-shadow: 0 4px 15px rgba(219, 112, 147, 0.3);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .success-message.show {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, #3d3d3d 0%, #4a4a4a 100%);
+            border: 2px solid #5d5d5d;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .example-box strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #ffc0cb;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .example-box p {
+            margin: 3px 0;
+            font-size: 11px;
+            color: #c0c0c0;
+            line-height: 1.5;
+        }
+
+        .example-box code {
+            background: #2d2d2d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffc0cb;
+            font-weight: 600;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ 设置</h1>
+            <p>智能卡片截图助手 - 个性化配置</p>
+        </header>
+
+        <div id="successMessage" class="success-message">
+            <span>✅</span>
+            <span>设置已保存！</span>
+        </div>
+
+        <div class="settings-wrapper">
+        <div class="settings-section">
+            <h2>📁 文件命名</h2>
+            
+            <div class="setting-item">
+                <label for="fileNameTemplate">文件名模板</label>
+                <input type="text" id="fileNameTemplate" value="截图_{n}" placeholder="截图_{n}">
+                <small>使用 {n} 表示数字序号，{date} 表示日期，{time} 表示时间</small>
+                
+                <div class="example-box">
+                    <strong>💡 示例：</strong>
+                    <p><code>第{n}张</code> → 第1张, 第2张...</p>
+                    <p><code>截图{n}_{date}</code> → 截图1_20241016...</p>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <label for="startNumber">起始序号</label>
+                <input type="number" id="startNumber" value="1" min="0">
+            </div>
+
+            <div class="setting-item">
+                <label for="numberPadding">补零</label>
+                <select id="numberPadding">
+                    <option value="0">不补零</option>
+                    <option value="2">2位（01）</option>
+                    <option value="3">3位（001）</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>⌨️ 快捷键</h2>
+            <div class="setting-item">
+                <button class="btn btn-secondary" id="openShortcuts" style="width: 100%;">
+                    🚀 打开快捷键设置
+                </button>
+                <small style="margin-top: 6px;">推荐：Ctrl+Shift+S</small>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>🎨 截图选项</h2>
+            
+            <div class="setting-item">
+                <label for="defaultQuality">图片质量</label>
+                <select id="defaultQuality">
+                    <option value="2">高清（2倍）</option>
+                    <option value="1">标准</option>
+                    <option value="3">超高清（3倍）</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <label for="imageFormat">格式</label>
+                <select id="imageFormat">
+                    <option value="png">PNG</option>
+                    <option value="jpg">JPG</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-section full-width">
+            <div class="button-group">
+                <button class="btn btn-primary" id="saveBtn">
+                    💾 保存设置
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    🔄 恢复默认
+                </button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+</body>
+</html>
+

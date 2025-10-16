@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能卡片截图助手</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="mode-section">
+            <h3>🎯 截图模式</h3>
+            <div class="mode-buttons">
+                <button id="autoDetect" class="mode-btn active">
+                    <span class="icon">🤖</span>
+                    <span class="text">自动识别</span>
+                    <span class="desc">智能识别卡片元素</span>
+                </button>
+                <button id="manualSelect" class="mode-btn">
+                    <span class="icon">👆</span>
+                    <span class="text">手动选择</span>
+                    <span class="desc">点击网页选择元素</span>
+                </button>
+                <button id="customSelector" class="mode-btn">
+                    <span class="icon">🔍</span>
+                    <span class="text">CSS选择器</span>
+                    <span class="desc">精确控制（推荐老火靓汤使用）</span>
+                </button>
+                <button id="freeSelection" class="mode-btn">
+                    <span class="icon">✂️</span>
+                    <span class="text">自由截图</span>
+                    <span class="desc">框选任意区域截图</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="selectorInput" class="selector-input hidden">
+            <label for="cssSelector">CSS选择器：</label>
+            <input type="text" id="cssSelector" placeholder=".main-card" value=".main-card">
+            <small>示例：.main-card, .card, .box, div.item（老火靓汤请用 .main-card）</small>
+        </div>
+
+        <div class="options-section">
+            <h3>⚙️ 截图选项</h3>
+            <div class="options-grid">
+                <div class="option">
+                    <label>
+                        <input type="checkbox" id="highQuality" checked>
+                        <span>高清模式</span>
+                    </label>
+                </div>
+                <div class="option">
+                    <label>
+                        <input type="checkbox" id="transparentBg">
+                        <span>透明背景</span>
+                    </label>
+                </div>
+                <div class="option">
+                    <label>
+                        <input type="checkbox" id="autoDownload" checked>
+                        <span>自动下载</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-section">
+            <button id="startCapture" class="primary-btn">
+                <span class="icon">📸</span>
+                开始截图
+            </button>
+            <button id="captureVisible" class="secondary-btn">
+                <span class="icon">🖼️</span>
+                截取可见区域
+            </button>
+            <button id="captureFullPage" class="secondary-btn">
+                <span class="icon">📄</span>
+                截取整个页面
+            </button>
+        </div>
+
+        <div id="status" class="status hidden">
+            <div class="spinner"></div>
+            <span id="statusText">正在处理...</span>
+        </div>
+
+        <footer>
+            <div class="stats">
+                <span id="elementCount">等待检测...</span>
+            </div>
+            <div class="links">
+                <a href="settings.html" id="settingsLink" target="_blank">⚙️ 设置</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
+
