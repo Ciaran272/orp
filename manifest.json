@@ -1,12 +1,17 @@
 {
   "manifest_version": 3,
   "name": "智能卡片截图助手",
-  "version": "1.0.0",
+  "version": "1.0.7.5",
   "description": "智能识别网页中的卡片元素，一键截图保存。支持自定义选择、批量截图、高清输出。",
   "permissions": [
     "activeTab",
     "downloads",
-    "storage"
+    "storage",
+    "notifications",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -22,18 +27,21 @@
     "128": "icons/icon128.png"
   },
   "commands": {
-    "_execute_action": {
+    "free-screenshot": {
       "suggested_key": {
         "default": "Ctrl+Shift+S",
         "mac": "Command+Shift+S"
       },
-      "description": "打开智能截图助手"
+      "description": "快速自由截图"
     }
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["libs/html2canvas.min.js", "content.js"],
+      "js": ["libs/html2canvas.min.js", "ai-detector.js", "content.js"],
       "css": ["content.css"],
       "run_at": "document_end"
     }

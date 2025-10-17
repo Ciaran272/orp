@@ -6,7 +6,9 @@ const defaultSettings = {
     startNumber: 1,
     numberPadding: 0,
     defaultQuality: 2,
-    imageFormat: 'png'
+    imageFormat: 'png',
+    aiMinScore: 0.3,
+    aiMinSize: 100
 };
 
 // 页面加载时读取设置并绑定事件
@@ -30,6 +32,8 @@ function loadSettings() {
         document.getElementById('numberPadding').value = settings.numberPadding;
         document.getElementById('defaultQuality').value = settings.defaultQuality;
         document.getElementById('imageFormat').value = settings.imageFormat;
+        document.getElementById('aiMinScore').value = settings.aiMinScore;
+        document.getElementById('aiMinSize').value = settings.aiMinSize;
     });
 }
 
@@ -40,7 +44,9 @@ function saveSettings() {
         startNumber: parseInt(document.getElementById('startNumber').value) || 1,
         numberPadding: parseInt(document.getElementById('numberPadding').value) || 0,
         defaultQuality: parseInt(document.getElementById('defaultQuality').value) || 2,
-        imageFormat: document.getElementById('imageFormat').value || 'png'
+        imageFormat: document.getElementById('imageFormat').value || 'png',
+        aiMinScore: parseFloat(document.getElementById('aiMinScore').value) || 0.3,
+        aiMinSize: parseInt(document.getElementById('aiMinSize').value) || 100
     };
 
     chrome.storage.sync.set(settings, () => {

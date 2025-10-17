@@ -16,6 +16,11 @@
                     <span class="text">自动识别</span>
                     <span class="desc">智能识别卡片元素</span>
                 </button>
+                <button id="aiDetect" class="mode-btn">
+                    <span class="icon">🧠</span>
+                    <span class="text">AI识别</span>
+                    <span class="desc">AI视觉智能识别</span>
+                </button>
                 <button id="manualSelect" class="mode-btn">
                     <span class="icon">👆</span>
                     <span class="text">手动选择</span>
@@ -40,27 +45,21 @@
             <small>示例：.main-card, .card, .box, div.item（老火靓汤请用 .main-card）</small>
         </div>
 
-        <div class="options-section">
-            <h3>⚙️ 截图选项</h3>
-            <div class="options-grid">
-                <div class="option">
-                    <label>
-                        <input type="checkbox" id="highQuality" checked>
-                        <span>高清模式</span>
-                    </label>
-                </div>
-                <div class="option">
-                    <label>
-                        <input type="checkbox" id="transparentBg">
-                        <span>透明背景</span>
-                    </label>
-                </div>
-                <div class="option">
-                    <label>
-                        <input type="checkbox" id="autoDownload" checked>
-                        <span>自动下载</span>
-                    </label>
-                </div>
+        <div class="options-section compact">
+            <div class="options-inline">
+                <span class="options-title">⚙️ 截图选项</span>
+                <label class="option-item">
+                    <input type="checkbox" id="highQuality" checked>
+                    <span>高清模式</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" id="transparentBg">
+                    <span>透明背景</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" id="autoDownload" checked>
+                    <span>自动下载</span>
+                </label>
             </div>
         </div>
 
@@ -77,11 +76,29 @@
                 <span class="icon">📄</span>
                 截取整个页面
             </button>
+            
+            <!-- 控制按钮区域 -->
+            <div id="controlButtons" class="control-buttons-inline hidden">
+                <button id="pauseBtn" class="control-btn pause-btn">
+                    <span class="icon">⏸️</span> 暂停
+                </button>
+                <button id="resumeBtn" class="control-btn resume-btn hidden">
+                    <span class="icon">▶️</span> 继续
+                </button>
+                <button id="stopBtn" class="control-btn stop-btn">
+                    <span class="icon">⏹️</span> 停止
+                </button>
+            </div>
         </div>
 
         <div id="status" class="status hidden">
-            <div class="spinner"></div>
-            <span id="statusText">正在处理...</span>
+            <div class="status-content">
+                <div class="spinner"></div>
+                <span id="statusText">正在处理...</span>
+            </div>
+            <div id="progressInfo" class="progress-info hidden">
+                <span id="progressText">进度: 0/0</span>
+            </div>
         </div>
 
         <footer>

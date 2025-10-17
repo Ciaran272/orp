@@ -40,6 +40,55 @@ header h1 {
     border-bottom: none;
 }
 
+/* 紧凑型选项布局 */
+.options-section.compact {
+    padding: 10px 15px;
+}
+
+.options-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.options-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.option-item {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 12px;
+    color: #3d3d3d;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+    transition: all 0.2s ease;
+}
+
+.option-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(219, 112, 147, 0.15);
+}
+
+.option-item input[type="checkbox"] {
+    margin-right: 5px;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #db7093;
+}
+
+.option-item input[type="checkbox"]:checked + span {
+    color: #db7093;
+    font-weight: 600;
+}
+
 .action-section {
     padding: 12px 15px 15px 15px;
     border-bottom: none;
@@ -238,9 +287,17 @@ h3 {
     margin: 0 15px 10px 15px;
     border-radius: 12px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 10px;
     box-shadow: 0 2px 8px rgba(219, 112, 147, 0.1);
+}
+
+.status-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .spinner {
@@ -302,6 +359,80 @@ footer {
 
 .hidden {
     display: none !important;
+}
+
+/* 控制按钮样式 */
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/* 内联控制按钮样式（在主按钮区域） */
+.control-buttons-inline {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    justify-content: center;
+}
+
+.control-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pause-btn {
+    background: #ffd700;
+    color: #333;
+}
+
+.pause-btn:hover {
+    background: #ffcc00;
+    transform: scale(1.05);
+}
+
+.resume-btn {
+    background: #4ecdc4;
+    color: white;
+}
+
+.resume-btn:hover {
+    background: #3cbdb3;
+    transform: scale(1.05);
+}
+
+.stop-btn {
+    background: #ff6b6b;
+    color: white;
+}
+
+.stop-btn:hover {
+    background: #ff5252;
+    transform: scale(1.05);
+}
+
+.progress-info {
+    font-size: 12px;
+    color: #666;
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    margin-top: 5px;
+}
+
+#progressText {
+    font-weight: 600;
+    color: #667eea;
 }
 
 /* 滚动条样式 */

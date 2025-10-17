@@ -329,6 +329,29 @@
             </div>
         </div>
 
+        <div class="settings-section">
+            <h2>🧠 AI识别设置</h2>
+            
+            <div class="setting-item">
+                <label for="aiMinScore">识别置信度</label>
+                <select id="aiMinScore">
+                    <option value="0.2">低（识别更多）</option>
+                    <option value="0.3" selected>中等（推荐）</option>
+                    <option value="0.5">高（识别更准）</option>
+                </select>
+                <small>置信度越高，识别越准确但可能遗漏</small>
+            </div>
+
+            <div class="setting-item">
+                <label for="aiMinSize">最小卡片尺寸</label>
+                <select id="aiMinSize">
+                    <option value="50">50px（识别更多）</option>
+                    <option value="100" selected>100px（推荐）</option>
+                    <option value="150">150px（过滤小卡片）</option>
+                </select>
+            </div>
+        </div>
+
         <div class="settings-section full-width">
             <div class="button-group">
                 <button class="btn btn-primary" id="saveBtn">
