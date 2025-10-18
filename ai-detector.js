@@ -36,11 +36,9 @@ class AICardDetector {
             if (onProgress) onProgress({ stage: 'algorithm', progress: 100 });
             
             this.isModelLoaded = true;
-            console.log('✓ 智能识别引擎加载完成');
             return true;
 
         } catch (error) {
-            console.error('引擎加载失败:', error);
             this.isModelLoaded = false;
             throw error;
         } finally {
@@ -92,7 +90,6 @@ class AICardDetector {
             };
 
         } catch (error) {
-            console.error('智能识别失败:', error);
             return {
                 success: false,
                 error: error.message,

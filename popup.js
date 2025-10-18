@@ -14,7 +14,6 @@ const elements = {
     cssSelector: document.getElementById('cssSelector'),
     startCapture: document.getElementById('startCapture'),
     captureVisible: document.getElementById('captureVisible'),
-    captureFullPage: document.getElementById('captureFullPage'),
     status: document.getElementById('status'),
     statusText: document.getElementById('statusText'),
     elementCount: document.getElementById('elementCount'),
@@ -39,43 +38,72 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
     } else if (request.action === 'captureComplete') {
         hideStatus();
-        showStatus(`✅ 成功截取 ${request.count} 张图片`);
+        showStatus(`成功截取 ${request.count} 张图片`);
         setTimeout(hideStatus, 2000);
     } else if (request.action === 'captureStopped') {
         hideStatus();
-        showStatus(`⏹️ 已停止，截取了 ${request.count} 张图片`);
+        showStatus(`已停止，截取了 ${request.count} 张图片`);
         setTimeout(hideStatus, 2000);
     }
     // 注意：requestScreenshot 由 background.js 统一处理
 });
 
 // 初始化
+// 检查并自动注入content.js
+async function ensureContentScriptInjected(tabId) {
+    try {
+        // 尝试ping content.js
+        const response = await chrome.tabs.sendMessage(tabId, { action: 'ping' });
+        if (response && response.success) {
+            return true;
+        }
+    } catch (error) {
+        try {
+            // 注入content.js
+            await chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                files: ['content.js']
+            });
+            
+            // 等待一下让脚本初始化
+            await new Promise(resolve => setTimeout(resolve, 200));
+            return true;
+        } catch (injectError) {
+            return false;
+        }
+    }
+    return false;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     // 获取当前标签页
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     currentTab = tab;
+
+    // 检查是否是特殊页面
+    if (isSpecialPage(currentTab.url)) {
+        elements.elementCount.textContent = '此页面不支持截图（系统页面）';
+        // 禁用所有截图按钮
+        elements.startCapture.disabled = true;
+        elements.captureVisible.disabled = true;
+        elements.startCapture.style.opacity = '0.5';
+        elements.captureVisible.style.opacity = '0.5';
+        return;
+    }
+
+    // 自动注入content.js（如果需要）
+    const injected = await ensureContentScriptInjected(currentTab.id);
+    if (!injected) {
+        elements.elementCount.textContent = '无法初始化，请刷新页面（F5）';
+        showStatus('无法初始化扩展，请刷新页面后重试');
+        return;
+    }
 
     // 加载保存的设置
     loadSettings();
 
     // 绑定事件
     bindEvents();
-
-    // 检查是否是特殊页面
-    if (isSpecialPage(currentTab.url)) {
-        elements.elementCount.textContent = '⚠️ 此页面不支持截图（系统页面）';
-        // 禁用所有截图按钮
-        elements.startCapture.disabled = true;
-        elements.captureVisible.disabled = true;
-        elements.captureFullPage.disabled = true;
-        elements.startCapture.style.opacity = '0.5';
-        elements.captureVisible.style.opacity = '0.5';
-        elements.captureFullPage.style.opacity = '0.5';
-        elements.startCapture.style.cursor = 'not-allowed';
-        elements.captureVisible.style.cursor = 'not-allowed';
-        elements.captureFullPage.style.cursor = 'not-allowed';
-        return;
-    }
 
     // 检测页面元素（只在非特殊页面）
     detectElements();
@@ -93,7 +121,6 @@ function bindEvents() {
     // 截图按钮
     elements.startCapture.addEventListener('click', startCapture);
     elements.captureVisible.addEventListener('click', captureVisible);
-    elements.captureFullPage.addEventListener('click', captureFullPage);
     
     // 控制按钮
     elements.pauseBtn.addEventListener('click', pauseCapture);
@@ -124,9 +151,9 @@ function switchMode(mode) {
 
     // 自由截图和手动选择模式不需要检测元素
     if (mode === 'freeSelection') {
-        elements.elementCount.textContent = '✂️ 框选模式已就绪';
+        elements.elementCount.textContent = '框选模式已就绪';
     } else if (mode === 'manualSelect') {
-        elements.elementCount.textContent = '👆 手动选择模式已就绪';
+        elements.elementCount.textContent = '手动选择模式已就绪';
     } else {
         // 其他模式都需要检测元素（包括AI模式）
         detectElements();
@@ -146,7 +173,7 @@ function isSpecialPage(url) {
 async function detectElements() {
     // 再次检查（防御性编程）
     if (isSpecialPage(currentTab.url)) {
-        elements.elementCount.textContent = '⚠️ 此页面不支持截图（系统页面）';
+        elements.elementCount.textContent = '此页面不支持截图（系统页面）';
         return;
     }
 
@@ -163,7 +190,7 @@ async function detectElements() {
         if (result && result.count !== undefined) {
             // 为AI模式添加特殊标记，但仍然显示元素数量
             if (currentMode === 'aiDetect') {
-                elements.elementCount.textContent = `🧠 检测到 ${result.count} 个可截图元素`;
+                elements.elementCount.textContent = `AI检测到 ${result.count} 个可截图元素`;
             } else {
                 elements.elementCount.textContent = `检测到 ${result.count} 个可截图元素`;
             }
@@ -172,9 +199,9 @@ async function detectElements() {
         // 不再使用 console.error，避免在控制台显示错误
         // 只显示用户友好的提示
         if (error.message && error.message.includes('Receiving end does not exist')) {
-            elements.elementCount.textContent = '💡 请刷新网页后重试';
+            elements.elementCount.textContent = '请刷新网页后重试';
         } else {
-            elements.elementCount.textContent = '💡 请刷新网页后重试';
+            elements.elementCount.textContent = '请刷新网页后重试';
         }
     }
 }
@@ -233,8 +260,7 @@ async function startCapture() {
 
         if (currentMode === 'aiDetect') {
             // AI识别模式
-            console.log('AI识别模式，显示控制按钮');
-            showStatus('🧠 正在加载AI模型...', true);
+            showStatus('正在加载AI模型...', true);
             updateProgress(0, 0);
             
             const result = await chrome.tabs.sendMessage(currentTab.id, {
@@ -244,11 +270,11 @@ async function startCapture() {
 
             if (result && result.success) {
                 hideStatus();
-                showStatus(`✅ AI识别成功，截取 ${result.count} 张图片`);
+                showStatus(`AI识别成功，截取 ${result.count} 张图片`);
                 setTimeout(hideStatus, 2000);
             } else {
                 hideStatus();
-                showStatus('❌ AI识别失败：' + (result?.error || '未知错误'));
+                showStatus('AI识别失败：' + (result?.error || '未知错误'));
                 setTimeout(hideStatus, 3000);
             }
         } else if (currentMode === 'manualSelect') {
@@ -274,8 +300,7 @@ async function startCapture() {
             }, 3000);
         } else {
             // 自动截图模式
-            console.log('自动截图模式，显示控制按钮');
-            showStatus('🎯 正在截图中...', true);
+            showStatus('正在截图中...', true);
             updateProgress(0, 0);
             
             const result = await chrome.tabs.sendMessage(currentTab.id, {
@@ -285,22 +310,22 @@ async function startCapture() {
 
             if (result && result.success) {
                 hideStatus();
-                showStatus(`✅ 成功截取 ${result.count} 张图片`);
+                showStatus(`成功截取 ${result.count} 张图片`);
                 setTimeout(hideStatus, 2000);
             } else {
                 hideStatus();
-                showStatus('❌ 截图失败：' + (result?.error || '未知错误'));
+                showStatus('截图失败：' + (result?.error || '未知错误'));
                 setTimeout(hideStatus, 3000);
             }
         }
     } catch (error) {
         // 友好的错误提示
         if (error.message && error.message.includes('Receiving end does not exist')) {
-            showStatus('💡 请先刷新网页（按F5）后重试');
+            showStatus('请先刷新网页（按F5）后重试');
         } else if (error.message && error.message.includes('Cannot access')) {
-            showStatus('❌ 此页面不支持扩展功能');
+            showStatus('此页面不支持扩展功能');
         } else {
-            showStatus('❌ 截图失败，请尝试刷新页面');
+            showStatus('截图失败，请尝试刷新页面');
         }
         setTimeout(hideStatus, 3000);
     }
@@ -334,73 +359,23 @@ async function captureVisible() {
 
         if (result && result.success) {
             if (result.preview) {
-                showStatus('✅ 截图完成，请在网页查看预览');
+                showStatus('截图完成，请在网页查看预览');
             } else {
-                showStatus('✅ 截图成功');
+                showStatus('截图成功');
             }
             setTimeout(hideStatus, 2000);
         } else {
-            showStatus('❌ 截图失败');
+            showStatus('截图失败');
             setTimeout(hideStatus, 3000);
         }
     } catch (error) {
         // 友好的错误提示
         if (error.message && error.message.includes('Receiving end does not exist')) {
-            showStatus('💡 请先刷新网页（按F5）后重试');
+            showStatus('请先刷新网页（按F5）后重试');
         } else if (error.message && error.message.includes('Cannot access')) {
-            showStatus('❌ 此页面不支持扩展功能');
+            showStatus('此页面不支持扩展功能');
         } else {
-            showStatus('❌ 截图失败，请尝试刷新页面');
-        }
-        setTimeout(hideStatus, 3000);
-    }
-}
-
-// 截取整个页面
-async function captureFullPage() {
-    showStatus('正在截取整个页面（这可能需要一些时间）...');
-
-    try {
-        // 不再预先检查页面类型，直接尝试截图
-
-        // 从存储中读取用户设置
-        const settings = await chrome.storage.sync.get({
-            defaultQuality: 2,
-            imageFormat: 'png'
-        });
-
-        const options = {
-            highQuality: elements.highQuality.checked,
-            quality: settings.defaultQuality,
-            imageFormat: settings.imageFormat,
-            transparentBg: elements.transparentBg.checked,
-            autoDownload: elements.autoDownload.checked
-        };
-
-        const result = await chrome.tabs.sendMessage(currentTab.id, {
-            action: 'captureFullPage',
-            options: options
-        });
-
-        if (result && result.success) {
-            if (result.preview) {
-                showStatus('✅ 截图完成，请在网页查看预览');
-            } else {
-                showStatus('✅ 截图成功');
-            }
-            setTimeout(hideStatus, 2000);
-        } else {
-            showStatus('❌ 截图失败');
-            setTimeout(hideStatus, 3000);
-        }
-    } catch (error) {
-        // 友好的错误提示
-        if (error.message && error.message.includes('Receiving end does not exist')) {
-            showStatus('💡 请先刷新网页（按F5）后重试');
-        } else if (error.message && error.message.includes('Cannot access')) {
-            showStatus('❌ 此页面不支持扩展功能');
-        } else {
-            showStatus('❌ 截图失败，请尝试刷新页面');
+            showStatus('截图失败，请尝试刷新页面');
         }
         setTimeout(hideStatus, 3000);
     }
@@ -413,7 +388,6 @@ function showStatus(text, showControls = false) {
     
     // 控制按钮现在在action-section中，独立控制显示
     if (showControls) {
-        console.log('显示控制按钮（在action区域）');
         elements.controlButtons.classList.remove('hidden');
         elements.progressInfo.classList.remove('hidden');
     }
@@ -445,7 +419,7 @@ async function pauseCapture() {
         elements.resumeBtn.classList.remove('hidden');
         elements.statusText.textContent = '已暂停';
     } catch (error) {
-        console.error('暂停失败:', error);
+        // 暂停失败，静默处理
     }
 }
 
@@ -459,7 +433,7 @@ async function resumeCapture() {
         elements.pauseBtn.classList.remove('hidden');
         elements.statusText.textContent = '继续截图中...';
     } catch (error) {
-        console.error('继续失败:', error);
+        // 继续失败，静默处理
     }
 }
 
@@ -470,13 +444,12 @@ async function stopCapture() {
         await chrome.tabs.sendMessage(tab.id, { action: 'stopCapture' });
         
         hideStatus();
-        showStatus('✅ 已停止截图', false);
+        showStatus('已停止截图', false);
         setTimeout(hideStatus, 2000);
     } catch (error) {
-        console.error('停止失败:', error);
+        // 停止失败，静默处理
     }
 }
-
 
 // 加载设置
 function loadSettings() {
@@ -504,7 +477,3 @@ function saveSettings() {
 
     chrome.storage.sync.set(settings);
 }
-
-// 注意：handleFreeScreenshotRequest 已移至 background.js
-// requestScreenshot 消息现在由 background.js 统一处理
-

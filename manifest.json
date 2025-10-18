@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
   "name": "智能卡片截图助手",
-  "version": "1.0.7.5",
+  "version": "1.6.0",
   "description": "智能识别网页中的卡片元素，一键截图保存。支持自定义选择、批量截图、高清输出。",
   "permissions": [
     "activeTab",
     "downloads",
     "storage",
     "notifications",
-    "tabs"
+    "tabs",
+    "scripting"
   ],
   "host_permissions": [
     "<all_urls>"
