@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "智能卡片截图助手",
-  "version": "1.6.0",
-  "description": "智能识别网页中的卡片元素，一键截图保存。支持自定义选择、批量截图、高清输出。",
+  "name": "cut",
+  "version": "2.0.0",
+  "description": "截图",
   "permissions": [
     "activeTab",
     "downloads",
@@ -42,7 +42,13 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["libs/html2canvas.min.js", "ai-detector.js", "content.js"],
+      "js": [
+        "content-core.js",
+        "libs/html2canvas.min.js",
+        "ai-detector.js",
+        "content.js",
+        "content-wrapper.js"
+      ],
       "css": ["content.css"],
       "run_at": "document_end"
     }
